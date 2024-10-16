@@ -83,6 +83,7 @@ Ndata_input %>%
   theme_bw(base_size = 16) +
   labs(x = "Year", y = "PCFG") +
   NULL
+ggsave(filename = here("img", "pcfg_lognorm_Oct-16-24.png"))
 
 # LOO --------------------------------------------------------------------------
 # Can use this for cross-validation to compare predictive performance against alternative projection-models
