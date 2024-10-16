@@ -29,21 +29,6 @@ init_pcfg_data = list(
 )
 # init_pcfg_data  # Check
 
-# Compile and Fit CMDSTAN ------------------------------------------------------
-init_mod_cmdstanr = cmdstanr::cmdstan_model(f_pcfg_lognorm)  # Compile the Stan code for fitting model to trend and removals
-
-# Maximum likelihood (mode of the posterior)
-# mod_fit = init_mod_cmdstanr$optimize(data = init_pcfg_data, 
-#                            init = list(list(mu_lambda = 1.,
-#                                             sigma_lambda = 0.1,
-#                                             lambda = rep(1.0, init_pcfg_data$n_dat_yrs),
-#                                             N_init = log(Ndata$N[1]) + 1)))  
-# mod_fit_mle = mod_fit$mle() %>% 
-#   tibble(var = names(.), val = .)
-# mod_fit_mle; 
-# tail(mod_fit_mle); 
-# filter(mod_fit_mle, var == "mu_lambda")
-
 # MCMC -------------------------------------------------------------------------
 init_mod_cmdstanr = cmdstanr::cmdstan_model(f_pcfg_lognorm)  # Compile the Stan code for fitting model to trend and removals
 mcmc_pcfg = init_mod_cmdstanr$sample(data = init_pcfg_data, 
@@ -55,7 +40,6 @@ mcmc_pcfg = init_mod_cmdstanr$sample(data = init_pcfg_data,
 # Wrangle Posterior ------------------------------------------------------------
 # Tidy draws
 tidy_mcmc = tidy_draws(mcmc_pcfg); names(tidy_mcmc)
-# lambda_out = select(tidy_mcmc, mu_lambda, sigma_lambda)
 
 N_out = tidy_mcmc %>% 
   spread_draws(N[year]) %>% 
