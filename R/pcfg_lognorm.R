@@ -23,14 +23,14 @@ Ndata_input = filter(Ndata, year > 2002) %>%
 # tail(Ndata_input)  # Check
 init_pcfg_data = list(
   n_dat_yrs = nrow(Ndata_input),  
-  n_proj_yrs = 10,
+  n_proj_yrs = 10,                  # number of years to project into the future
   mu_N_hat = Ndata_input$mean_log,  # log space
   sigma_N_hat = Ndata_input$sd_log
 )
 # init_pcfg_data  # Check
 
 # MCMC -------------------------------------------------------------------------
-init_mod_cmdstanr = cmdstanr::cmdstan_model(f_pcfg_lognorm)  # Compile the Stan code for fitting model to trend and removals
+init_mod_cmdstanr = cmdstanr::cmdstan_model(f_pcfg_lognorm)  # Compile the Stan code for fitting model 
 mcmc_pcfg = init_mod_cmdstanr$sample(data = init_pcfg_data, 
                                output_dir = here("out"),
                                seed = 42,
