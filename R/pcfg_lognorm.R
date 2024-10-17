@@ -16,7 +16,7 @@ source(here("R", "read_abun_retro.R"))
 f_pcfg_lognorm = here::here('STAN', 'pcfg_lognorm.stan')
 
 # Input data -------------------------------------------------------------------
-Ndata_input = filter(Ndata, year > 2002) %>% 
+Ndata_input = filter(Ndata, year >= 2002) %>% 
   mutate(mean_log = calc_mu_log(mu = N, sd = SE),
          sd_log = calc_sd_log(mu = N, sd = SE),
          cv = SE / N)
