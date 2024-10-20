@@ -13,11 +13,7 @@ p_load(cmdstanr, tidyverse, here, tidybayes, brms)
 # Initialize -------------------------------------------------------------------
 source(here("R", "read_abun_retro.R"))
 # Ndata; tail(Ndata)  # Check
-#f_pcfg_lognorm = here::here('STAN', 'pcfg_lognorm.stan')
-#f_pcfg_lognorm = here::here('STAN', 'pcfg_lognorm_harvest.stan')
-# f_pcfg_lognorm = here::here('STAN', 'pcfg_lognorm_harvest_v2.stan')
-# f_pcfg_lognorm = here::here('STAN', 'pcfg_lognorm_harvest_ar1.stan')
-f_pcfg_lognorm = here::here('STAN', 'pcfg_lognorm_harvest_ar1_v2.stan')
+f_pcfg_lognorm = here::here('STAN', 'pcfg_lognorm_harvest_calves.stan')
 
 # Input data -------------------------------------------------------------------
 Ndata_input = filter(Ndata, year > 2002) %>% 
@@ -25,12 +21,23 @@ Ndata_input = filter(Ndata, year > 2002) %>%
          sd_log = calc_sd_log(mu = N, sd = SE),
          cv = SE / N)
 # tail(Ndata_input)  # Check
+
+# covariate data on lambda
+# at present, not the precise time series and should be viewed as a filler for model development
+x_lambda = data.frame(
+  N_calves = c(4,5,3,0,3,2,1,4,6,12,14,17,12,7,4,4,2,4,5,2, # abundance data years
+               0,0,0) # projected years
+)
+
 init_pcfg_data = list(
   n_dat_yrs = nrow(Ndata_input),  
-  n_proj_yrs = 3,                  # number of years to project into the future
+  n_proj_yrs = 3,                      # number of years to project into the future
+  n_betas = 1,                         # number of coefficients on lambda
   mu_logN_hat = Ndata_input$mean_log,  # log space
   sigma_logN_hat = Ndata_input$sd_log,
-  N_harvest = rep(c(0,0,0),)
+  N_harvest = c(2, 2, 2),
+  x_lambda_dat = as.matrix(x_lambda %>% slice(1:nrow(Ndata_input))),
+  x_lambda_proj = as.matrix(x_lambda %>% slice(-c(1:nrow(Ndata_input))))
 )
 # init_pcfg_data  # Check
 
@@ -88,13 +95,7 @@ Ndata_input %>%
   theme_bw(base_size = 16) +
   labs(x = "Year", y = "PCFG") +
   NULL
-# ggsave(filename = here("img", "pcfg_lognorm_v1_Oct-19-24.png"),
-#        width = 8, height = 5, units = "in", dpi = 300)
-# ggsave(filename = here("img", "pcfg_lognorm_v2_Oct-19-24.png"),
-#       width = 8, height = 5, units = "in", dpi = 300)
-# ggsave(filename = here("img", "pcfg_lognorm_ar1_v1_Oct-19-24.png"),
-#        width = 8, height = 5, units = "in", dpi = 300)
-ggsave(filename = here("img", "pcfg_lognorm_ar1_v2_Oct-19-24.png"),
+ggsave(filename = here("img", "pcfg_lognorm_calfCov_Oct-19-24.png"),
        width = 8, height = 5, units = "in", dpi = 300)
 
 # LOO --------------------------------------------------------------------------
